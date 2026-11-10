@@ -1,0 +1,23 @@
+# Secrets and credentials -- never commit
+.env
+.powerbi_token.json
+targets.ini
+*.pem
+*.key
+
+# Scan output (contains host names, IPs and findings) and the NVD cache
+sbom_out/
+t1ote_out/
+.sbom_cache/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/

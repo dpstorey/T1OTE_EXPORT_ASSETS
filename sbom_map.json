@@ -1,0 +1,202 @@
+{
+  "^450l\\ safety\\ light\\ curtain": [
+    "allen-bradley",
+    "guardshield"
+  ],
+  "^abb\\ 800xa\\ rnrp\\ 6\\.0\\.2\\-1\\ \\(5\\.16\\.0\\)": [
+    "abb",
+    "800xa_rnrp"
+  ],
+  "^abb\\ base\\ software\\ for\\ softcontrol\\ 6\\.0\\.0\\-1": [
+    "abb",
+    "base_software"
+  ],
+  "^abb\\ mms\\ server\\ for\\ ac\\ 800m\\ 6\\.0\\.0\\-1": [
+    "abb",
+    "mms_server"
+  ],
+  "^abb\\ opc\\ server\\ for\\ ac\\ 800m\\ 6\\.0\\.0\\-1": [
+    "abb",
+    "opc_server"
+  ],
+  "^adobe\\ flash\\ player\\ 15\\ activex": [
+    "adobe",
+    "flash_player"
+  ],
+  "^adobe\\ reader\\ xi": [
+    "adobe",
+    "reader"
+  ],
+  "^deltav\\ 13\\.3": [
+    "emerson",
+    "deltav"
+  ],
+  "^ecostruxure\\ control\\ expert": [
+    "schneider-electric",
+    "ecostruxure_control_expert"
+  ],
+  "^ecostruxure\\ machine\\ expert\\ \\-\\ basic\\ v": [
+    "schneider-electric",
+    "ecostruxure_machine_expert"
+  ],
+  "^factorytalk\\ alarms\\ and\\ events\\ \\(cpr\\ 9\\ sr\\ 14\\)": [
+    "rockwellautomation",
+    "factorytalk_alarms_and_events"
+  ],
+  "^factorytalk\\ alarms\\ and\\ events\\ \\(cpr\\ 9\\ sr\\ 9\\)": [
+    "rockwellautomation",
+    "factorytalk_alarms_and_events"
+  ],
+  "^google\\ update\\ helper": [
+    "google",
+    "update_helper"
+  ],
+  "^mcafee\\ agent": [
+    "mcafee",
+    "agent"
+  ],
+  "^microsoft\\ \\.net\\ framework\\ 1\\.1": [
+    "microsoft",
+    ".net_framework"
+  ],
+  "^microsoft\\ \\.net\\ framework\\ 4\\.5\\.2": [
+    "microsoft",
+    ".net_framework"
+  ],
+  "^microsoft\\ nuget\\ \\-\\ visual\\ studio\\ 2013": [
+    "microsoft",
+    "nuget"
+  ],
+  "^microsoft\\ onedrive": [
+    "microsoft",
+    "onedrive"
+  ],
+  "^microsoft\\ report\\ viewer\\ 2015\\ runtime": [
+    "microsoft",
+    "report_viewer"
+  ],
+  "^microsoft\\ silverlight": [
+    "microsoft",
+    "silverlight"
+  ],
+  "^microsoft\\ visual\\ c\\+\\+\\ 2005\\ redistributable": [
+    "microsoft",
+    "visual_c++"
+  ],
+  "^microsoft\\ visual\\ c\\+\\+\\ 2005\\ redistributable\\ \\-\\ kb2467175": [
+    "microsoft",
+    "visual_c++"
+  ],
+  "^microsoft\\ visual\\ c\\+\\+\\ 2008\\ redistributable": [
+    "microsoft",
+    "visual_c++"
+  ],
+  "^microsoft\\ visual\\ c\\+\\+\\ 2008\\ redistributable\\ \\-\\ \\.17": [
+    "microsoft",
+    "visual_c++"
+  ],
+  "^microsoft\\ visual\\ c\\+\\+\\ 2010\\ redistributable": [
+    "microsoft",
+    "visual_c++"
+  ],
+  "^microsoft\\ visual\\ c\\+\\+\\ 2012\\ redistributable\\ \\-\\ 11\\.0\\.61030": [
+    "microsoft",
+    "visual_c++"
+  ],
+  "^microsoft\\ visual\\ c\\+\\+\\ 2013\\ redistributable\\ \\-\\ 12\\.0\\.30501": [
+    "microsoft",
+    "visual_c++"
+  ],
+  "^microsoft\\ visual\\ c\\+\\+\\ 2015\\-2022\\ redistributable\\ \\-\\ 14\\.38\\.33135": [
+    "microsoft",
+    "visual_c++"
+  ],
+  "^microsoft\\ visual\\ c\\+\\+\\ 2015\\-2022\\ redistributable\\ \\-\\ 14\\.44\\.35211": [
+    "microsoft",
+    "visual_c++"
+  ],
+  "^microsoft\\ visual\\ studio\\ professional\\ 2013": [
+    "microsoft",
+    "visual_studio"
+  ],
+  "^pkzip\\ server\\ for\\ windows": [
+    "pkware",
+    "pkzip_server_for_windows"
+  ],
+  "^primary\\ setup\\ tool\\ v4\\.2": [
+    "siemens",
+    "primary_setup_tool"
+  ],
+  "^python\\ 2\\.7\\.13": [
+    "python",
+    "python"
+  ],
+  "^python\\ 2\\.7\\.14": [
+    "python",
+    "python"
+  ],
+  "^python\\ 2\\.7\\.6": [
+    "python",
+    "python"
+  ],
+  "^schneider\\ electric\\ floating\\ license\\ manager": [
+    "schneider-electric",
+    "floating_license_manager"
+  ],
+  "^schneider\\ electric\\ software\\ update": [
+    "schneider-electric",
+    "software_update"
+  ],
+  "^siemens\\ automation\\ license\\ manager\\ v5\\.3\\ \\+\\ sp2": [
+    "siemens",
+    "automation_license_manager"
+  ],
+  "^siemens\\ automation\\ license\\ manager\\ v5\\.3\\ \\+\\ sp2\\ \\+\\ upd2": [
+    "siemens",
+    "automation_license_manager"
+  ],
+  "^siemens\\ digsi\\ 5\\ v7\\.30": [
+    "siemens",
+    "digsi_5"
+  ],
+  "^simatic\\ step\\ 7\\ v5\\.5\\ \\+\\ sp1": [
+    "siemens",
+    "simatic_step_7"
+  ],
+  "^sql\\ server\\ 2008\\ r2\\ sp2\\ database\\ engine\\ services": [
+    "microsoft",
+    "sql_server"
+  ],
+  "^sql\\ server\\ 2014\\ database\\ engine\\ services": [
+    "microsoft",
+    "sql_server"
+  ],
+  "^totally\\ integrated\\ automation\\ portal\\ v13\\ \\-\\ tia\\ portal\\ single\\ setuppackage\\ v13\\.0\\ \\+\\ sp1": [
+    "siemens",
+    "totally_integrated_automation_portal"
+  ],
+  "^unity\\ pro": [
+    "schneider-electric",
+    "unity_pro"
+  ],
+  "^unityloader": [
+    "schneider-electric",
+    "unityloader"
+  ],
+  "^visual\\ basic\\ for\\ applications\\ \\(r\\)\\ core": [
+    "microsoft",
+    "visual_basic_for_applications"
+  ],
+  "^vmware\\ vsphere\\ client\\ 6\\.0": [
+    "vmware",
+    "vsphere_client"
+  ],
+  "^vnc\\ server": [
+    "realvnc",
+    "vnc_server"
+  ],
+  "^wincc\\ runtime\\ advanced\\ v13\\.0\\ sp1\\ \\-\\ simatic\\ wincc\\ runtime\\ advanced\\ v13\\.0\\ \\+\\ sp1": [
+    "siemens",
+    "simatic_wincc_runtime_advanced"
+  ]
+}
