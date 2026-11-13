@@ -346,6 +346,103 @@ are dropped by default (`--keep-noise` keeps them).
   every 25 NVD requests, so an interrupted run (Ctrl-C) keeps its work.
 - `--fuzzy` makes one keyword search per unmapped product, so it takes noticeably longer.
 
+## PostgreSQL (optional)
+
+The same three tables can go to a PostgreSQL database, a script, or both. Like `--powerbi`, each
+run **replaces** the contents of the tables, in one transaction, so a failed run leaves the
+previous data in place. Keep your own history by copying the tables before the next run.
+
+```
+pip install "psycopg[binary]"          # only needed for --db, not for --sql-out
+./t1ote_export_assets.py run --sql-out t1ote_out/t1ote.sql     # review it, then: psql -v ON_ERROR_STOP=1 -f t1ote_out/t1ote.sql
+./t1ote_export_assets.py run --db                               # write straight to the database
+```
+
+- **Connection (`--db`).** `--db-url postgresql://user@host:5432/dbname`, or `T1OTE_DB_URL` in
+  `.env`, or the standard `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER` and `PGPASSWORD`
+  variables (`~/.pgpass` works too). Do not put a password in `--db-url`; it ends up in your
+  shell history.
+- **Schema.** Tables are created in schema `t1ote` (`--db-schema` or `T1OTE_DB_SCHEMA` to change it),
+  which is created if missing. The user needs `CREATE` on the database, or an existing schema it can use.
+- **Tables.** `assets` (the columns you selected, custom fields included), `sbom_software`
+  (primary key `software_id`) and `sbom_findings` (primary key `software_id, cve_id`), with the
+  same columns as the Power BI tables. Column names keep their case and spaces, so quote them:
+  `SELECT "Cost Centre" FROM t1ote.assets`. Join `assets.asset_id` to `sbom_software.asset_id`, and
+  `sbom_software.software_id` to `sbom_findings.software_id`.
+- **Columns change safely.** A run with new columns (a new custom field, say) adds them to the
+  table. Columns are never dropped or retyped; drop one by hand if you stop exporting it.
+- **`sbom_exposure` view.** Counts each CVE once per host and product family (`cpe_product`),
+  with `software_count`, so fragments do not inflate the numbers. See "Fragments and duplicate findings".
+- **Dry runs** (`--dry-run`) write nothing, and `--sql-out` is written only if the run succeeds (with
+  `run`, the assets part is kept if the software part later fails).
+- **Several runs at once** into the same schema will queue on the table lock; schedule them one after another.
+
+### Using Metabase
+
+[Metabase](https://www.metabase.com/) reads the PostgreSQL tables directly, so you can browse
+and chart the export without writing code. These steps assume Metabase runs in Docker next to a
+Postgres container; adjust host names if yours differs.
+
+**1. Use a separate database for the export.** If Metabase keeps its own settings in a Postgres
+database, do not load the export into that one. Create a new database and two users inside the
+same Postgres: one that the tool writes with, and one read-only user for Metabase.
+
+```
+docker exec -i <postgres-container> psql -U <admin-user> -d <admin-database> <<'SQL'
+CREATE USER t1ote WITH PASSWORD '<password-1>';
+CREATE DATABASE t1ote OWNER t1ote;
+CREATE USER metabase_ro WITH PASSWORD '<password-2>';
+SQL
+docker exec -i <postgres-container> psql -U <admin-user> -d t1ote \
+  -c "CREATE SCHEMA IF NOT EXISTS t1ote AUTHORIZATION t1ote;"
+```
+
+Point the tool at it (`T1OTE_DB_URL=postgresql://t1ote@<host>:5432/t1ote`, with the password in
+`PGPASSWORD`) and run `run --db` once so the tables exist. Then give the read-only user access:
+
+```
+docker exec -i <postgres-container> psql -U <admin-user> -d t1ote -c "GRANT USAGE ON SCHEMA t1ote TO metabase_ro; GRANT SELECT ON ALL TABLES IN SCHEMA t1ote TO metabase_ro; ALTER DEFAULT PRIVILEGES FOR ROLE t1ote IN SCHEMA t1ote GRANT SELECT ON TABLES TO metabase_ro;"
+```
+
+If the Postgres on the host and the container both want port 5432, one of them will not start;
+check with `ss -ltnp | grep 5432`. Commands that use `sudo -u postgres psql` talk to a Postgres
+installed on the host, not the one in the container.
+
+**2. Add the database in Metabase.** Admin -> Databases -> Add database -> PostgreSQL:
+
+| Field | Value |
+| --- | --- |
+| Host | The Postgres container's service name (for example `postgres`) |
+| Port | 5432 |
+| Database name | `t1ote` |
+| Username | `metabase_ro` |
+| Schemas | Only these: `t1ote` |
+| SSL, SSH tunnel | Off when Metabase and Postgres share a Docker network |
+
+After a run that adds tables or columns, press "Sync database schema now" on the database page.
+Runs that only refresh existing tables need nothing.
+
+**3. Join the tables.** In Admin -> Table metadata, set the Semantic type of `assets.asset_id` and
+`sbom_software.software_id` to **Entity Key**; the tool does not create a primary key on `assets`,
+and Metabase only offers Entity Keys as foreign-key targets. Then set **Foreign Key** on
+`sbom_software.asset_id`, `sbom_findings.asset_id` and `sbom_exposure.asset_id` (target
+`assets.asset_id`) and on `sbom_findings.software_id` (target `sbom_software.software_id`). Changes
+save automatically.
+
+**Things to know**
+
+- A table that is missing from Browse may be set to **Hidden** in Admin -> Table metadata. Set it
+  to Queryable.
+- Count from `sbom_exposure`, not `sbom_findings`: it lists each CVE once per host and product
+  family, so a product that installs as many pieces does not inflate the totals.
+- Each run replaces the table contents, so open dashboards show the new numbers on refresh.
+- Keep passwords in `PGPASSWORD` or `~/.pgpass`, never in `T1OTE_DB_URL` or in git.
+
+Starter queries (exposure at a glance, known-exploited findings by host, software coverage,
+products with the most exposure) are in `docs/metabase_queries.sql`. Paste each one into
+New -> SQL query and save it.
+
+
 ## Power BI (optional)
 
 Both tools write into **one push dataset with three tables**, so Power BI can relate them:

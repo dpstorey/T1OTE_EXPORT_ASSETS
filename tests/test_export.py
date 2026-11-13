@@ -143,6 +143,17 @@ class ExportTests(unittest.TestCase):
         self.assertTrue(list(Path(self.outdir).glob("assets_*.csv")))
         self.assertTrue(list(Path(self.outdir).glob("sbom_cves_*.csv")))
 
+    def test_run_writes_one_sql_script_with_all_three_tables(self):
+        self.world(standalone_icp=True)
+        path = str(Path(self.outdir) / "all.sql")
+        code, out, err = self.run_cli("run", "--out-dir", self.outdir, "--sql-out", path)
+        self.assertEqual(code, 0, err)
+        text = Path(path).read_text()
+        for name in ("assets", "sbom_software", "sbom_findings"):
+            self.assertIn(f'CREATE TABLE IF NOT EXISTS "t1ote"."{name}"', text)
+        self.assertEqual(text.count("BEGIN;"), 1)                         # one script, one transaction
+        self.assertIn('"firmware_version" text', text)                    # every asset column by default
+
     def test_run_dry_run_touches_nothing(self):
         w = self.world(standalone_icp=True)
         code, out, err = self.run_cli("run", "--dry-run", "--powerbi", "--out-dir", self.outdir)

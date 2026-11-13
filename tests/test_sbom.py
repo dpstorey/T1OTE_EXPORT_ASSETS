@@ -570,6 +570,29 @@ class ScanTests(Base):
         self.assertEqual(bom["compositions"], [{"aggregate": "incomplete", "assemblies": [root]}])
         self.assertNotIn("authors", bom["metadata"])                                     # nothing invented when not supplied
 
+    def test_sql_out_writes_the_two_sbom_tables_and_the_exposure_view(self):
+        self.world()
+        path = self.out.parent / "pg" / "sbom.sql"
+        code, out, err = self.scan("--sql-out", str(path))
+        self.assertEqual(code, 0, err)
+        text = path.read_text()
+        self.assertIn('CREATE TABLE IF NOT EXISTS "t1ote"."sbom_software"', text)
+        self.assertIn('CREATE TABLE IF NOT EXISTS "t1ote"."sbom_findings"', text)
+        self.assertIn('"cpe_product" text', text)
+        self.assertIn('PRIMARY KEY ("software_id", "cve_id")', text)
+        self.assertIn("CVE-2024-1111", text)
+        self.assertIn('CREATE OR REPLACE VIEW "t1ote"."sbom_exposure"', text)
+        self.assertLess(text.index('TRUNCATE "t1ote"."sbom_software"'), text.index('TRUNCATE "t1ote"."sbom_findings"'))
+        self.assertIn("PostgreSQL:", out)
+
+    def test_db_without_the_driver_fails_clearly_before_any_work(self):
+        w = self.world()
+        with mock.patch.dict(sys.modules, {"psycopg": None}):
+            code, out, err = self.scan("--db")
+        self.assertEqual(code, 1)
+        self.assertIn("psycopg", err)
+        self.assertEqual(w.nvd_requests, [])
+
     def test_cyclonedx_is_compact_and_descriptions_are_optional(self):
         self.world()
         self.scan("--cyclonedx")

@@ -48,6 +48,7 @@ from typing import Any, Iterator
 from urllib.parse import urlencode
 
 import t1ote_core as hx
+import t1ote_sql as sq
 from t1ote_core import ExportError, log
 
 __version__ = "0.1.0"
@@ -1288,6 +1289,15 @@ SBOM_FINDINGS_COLUMNS = [
 ]
 
 
+## @brief PostgreSQL definitions of the two SBOM tables (same columns as Power BI).
+def sql_tables() -> tuple[sq.Table, sq.Table]:
+    software = sq.Table(SOFTWARE_TABLE, list(SBOM_SOFTWARE_COLUMNS), key=("software_id",), indexes=("asset_id", "cpe_product"))
+    findings = sq.Table(
+        FINDINGS_TABLE, list(SBOM_FINDINGS_COLUMNS), key=("software_id", "cve_id"), indexes=("asset_id", "cve_id", "cpe_product"),
+    )
+    return software, findings
+
+
 ## @brief The export tool's Power BI client, creating one dataset with all three tables.
 #  @details The `assets` table (filled by `t1ote_export_assets.py assets --powerbi`) and the two SBOM
 #  tables share a dataset so Power BI can relate them:
@@ -1490,4 +1500,17 @@ def run_sbom(args: argparse.Namespace) -> int:
         except ExportError as e:
             raise ExportError(f"The report files above were written, but the Power BI push failed: {e}") from e
         print(f"Power BI: {len(software)} software row(s) and {len(rows)} finding(s) written ({b1 + b2} batch(es)).")
+    sink = getattr(args, "sink", None)
+    if sink is not None:
+        ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        t_software, t_findings = sql_tables()
+        t_findings.after.append(sq.exposure_view(sink.schema))
+        try:
+            log(f"Replacing PostgreSQL tables {t_software.name!r} and {t_findings.name!r}...")
+            n1 = sink.replace_table(t_software, powerbi_software_rows(software, ts))  # parent first
+            n2 = sink.replace_table(t_findings, powerbi_rows(rows, ts))
+            sink.checkpoint()
+        except Exception as e:
+            raise ExportError(f"The report files above were written, but the PostgreSQL write failed (nothing was changed): {e}") from e
+        print(f"PostgreSQL: {n1} software row(s) and {n2} finding(s) written to schema {sink.schema!r}" + (f"; script {args.sql_out}" if args.sql_out else "") + ".")
     return 0

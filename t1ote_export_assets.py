@@ -46,6 +46,7 @@ from dotenv import load_dotenv
 
 import t1ote_core as hx
 import t1ote_sbom as sbom
+import t1ote_sql as sq
 from t1ote_core import ExportError, log
 
 ## @brief Program version, shown by `--version`.
@@ -176,6 +177,15 @@ def cmd_assets(args: argparse.Namespace) -> int:
         except ExportError as e:
             raise ExportError(f"The assets file above was written, but the Power BI push failed: {e}") from e
         print(f"Power BI: {len(rows)} asset(s) written to {pbi.cfg.table_name!r} in {batches} batch(es).")
+    sink = getattr(args, "sink", None)
+    if sink is not None:
+        try:
+            log("Replacing PostgreSQL table 'assets'...")
+            n = sink.replace_table(sq.assets_table(columns), rows)
+            sink.checkpoint()
+        except Exception as e:
+            raise ExportError(f"The assets file above was written, but the PostgreSQL write failed (nothing was changed): {e}") from e
+        print(f"PostgreSQL: {n} asset(s) written to schema {sink.schema!r}" + (f"; script {args.sql_out}" if args.sql_out else "") + ".")
     return 0
 
 
@@ -218,6 +228,7 @@ def build_parser() -> argparse.ArgumentParser:
             sbom.add_sbom_args(sp)
         if output:
             hx.add_output_args(sp)
+            sq.add_db_args(sp)
         sp.set_defaults(func=func)
         return sp
 
@@ -259,14 +270,22 @@ def main(argv: list[str] | None = None) -> int:
         # a variable that is already set, so real environment variables always win.
         load_dotenv(Path(__file__).resolve().parent / ".env")
         load_dotenv(Path.cwd() / ".env")
+    sink = None
+    ok = False
     try:
-        return args.func(args)
+        sink = args.sink = sq.open_sink(args)
+        code = args.func(args)
+        ok = code == 0
+        return code
     except ExportError as e:
         print(f"Error: {e}", file=sys.stderr)
         return 1
     except KeyboardInterrupt:
         print("Interrupted.", file=sys.stderr)
         return 130
+    finally:
+        if sink is not None:
+            sink.finish(ok)
 
 
 if __name__ == "__main__":
