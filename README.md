@@ -83,7 +83,11 @@ wrong. `python t1ote_export_assets.py sites` shows what each target is and lists
 ### Several targets: a config file
 
 For several ICPs with no EM, or a mix, describe them in a config file and pass
-`--config`. Start from `targets.example.ini`:
+`--config`. Create it from the example, then fill in your targets:
+
+```bash
+cp targets.example.ini targets.ini   # then edit targets.ini
+```
 
 ```ini
 [DEFAULT]
@@ -170,7 +174,7 @@ python t1ote_export_assets.py sites                 # what each target is, and i
 python t1ote_export_assets.py assets --dry-run      # fetch and summarise, touch nothing
 python t1ote_export_assets.py assets                # write assets_*.csv
 python t1ote_export_assets.py assets --powerbi      # ...and replace the Power BI `assets` table
-python t1ote_export_assets.py assets --config targets.ini --subnet 10.253.10.128/25
+python t1ote_export_assets.py assets --config targets.ini --subnet 192.168.101.0/25
 ```
 
 `assets` takes the same connection, scope and output options as `sbom` (`--subnet`, `--ip-range`,

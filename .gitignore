@@ -5,6 +5,11 @@ targets.ini
 *.pem
 *.key
 
+# No mac style files
+._*
+
+
+
 # Scan output (contains host names, IPs and findings) and the NVD cache
 sbom_out/
 t1ote_out/
